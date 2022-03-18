@@ -1,80 +1,130 @@
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-#endif
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
+using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
 		[Header("Character Input Values")]
-		public Vector2 move;
-		public Vector2 look;
-		public bool jump;
-		public bool sprint;
+		[SerializeField] private Vector2 move;
+		[SerializeField] private Vector2 look;
+		[SerializeField] private bool jump;
 
 		[Header("Movement Settings")]
-		public bool analogMovement;
+		[SerializeField] private bool analogMovement;
 
-#if !UNITY_IOS || !UNITY_ANDROID
-		[Header("Mouse Cursor Settings")]
-		public bool cursorLocked = true;
-		public bool cursorInputForLook = true;
+		[Header("Touch Settings")]
+		[SerializeField] private float touchSensitivity = 10.0f;
+		private int lookTouchID;
+
+#if UNITY_EDITOR
+		[Header("Editor Input Settings")]
+		[SerializeField] private bool keyboardAndMouseControls = true;
+		[SerializeField] private float mouseSensitivity = 200.0f;
+		[SerializeField] private bool lockCursor = true;
 #endif
 
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-		public void OnMove(InputValue value)
+		private void Awake()
 		{
-			MoveInput(value.Get<Vector2>());
+			EnhancedTouchSupport.Enable();
 		}
 
-		public void OnLook(InputValue value)
+		private void Update()
 		{
-			if(cursorInputForLook)
+			InputUpdate();
+		}
+
+		private void InputUpdate()
+		{
+#if UNITY_EDITOR
+			if (keyboardAndMouseControls)
 			{
-				LookInput(value.Get<Vector2>());
+				look = new Vector2(Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y")) * mouseSensitivity;
+				move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+				jump = Input.GetKey(KeyCode.Space);
+
+				return;
+			}
+#endif
+
+			look = Vector2.zero;
+
+			if (Touch.activeTouches.Count > 0)
+			{
+				//Find suitable touch
+				for (int i = 0; i < Touch.activeTouches.Count; i++)
+				{
+					if (Touch.activeTouches[i].phase == TouchPhase.Began && !EventSystem.current.IsPointerOverGameObject(Touch.activeTouches[i].touchId))
+					{
+						lookTouchID = Touch.activeTouches[i].touchId;
+						break;
+					}
+				}
+
+				Touch currentLookTouch;
+				if (GetTouch(lookTouchID, out currentLookTouch))
+				{
+					look.x = currentLookTouch.delta.x * touchSensitivity;
+					look.y = -currentLookTouch.delta.y * touchSensitivity;
+				}
 			}
 		}
 
-		public void OnJump(InputValue value)
-		{
-			JumpInput(value.isPressed);
+		private bool GetTouch(int touchID, out Touch result)
+        {
+			for (int i = 0; i < Touch.activeTouches.Count; i++)
+            {
+				var currentTouch = Touch.activeTouches[i];
+
+				if (currentTouch.touchId == touchID)
+				{
+					result = currentTouch;
+					return true;
+				}
+			}
+
+			result = new Touch();
+			return false;
 		}
 
-		public void OnSprint(InputValue value)
+        public void OnMove(InputAction.CallbackContext value)
 		{
-			SprintInput(value.isPressed);
+			MoveInput(value.ReadValue<Vector2>());
 		}
-#else
-	// old input sys if we do decide to have it (most likely wont)...
-#endif
 
+		public void OnJump(InputAction.CallbackContext value)
+		{
+			JumpInput(value.action.triggered);
+		}
 
 		public void MoveInput(Vector2 newMoveDirection)
 		{
 			move = newMoveDirection;
 		} 
 
-		public void LookInput(Vector2 newLookDirection)
-		{
-			look = newLookDirection;
-		}
-
 		public void JumpInput(bool newJumpState)
 		{
 			jump = newJumpState;
 		}
 
-		public void SprintInput(bool newSprintState)
-		{
-			sprint = newSprintState;
-		}
+		public Vector2 GetMove() => move;
 
-#if !UNITY_IOS || !UNITY_ANDROID
+		public Vector2 GetLook() => look;
+
+		public bool IsJumping() => jump;
+
+		public bool IsAnalog() => analogMovement;
+
+#if UNITY_EDITOR
 
 		private void OnApplicationFocus(bool hasFocus)
 		{
-			SetCursorState(cursorLocked);
+			if(keyboardAndMouseControls)
+				SetCursorState(lockCursor);
 		}
 
 		private void SetCursorState(bool newState)
@@ -83,7 +133,5 @@ namespace StarterAssets
 		}
 
 #endif
-
 	}
-	
 }
