@@ -13,9 +13,8 @@ GameObject:
   - component: {fileID: 6483554099135143963}
   - component: {fileID: 1557486221260924829}
   - component: {fileID: 1663187150}
-  - component: {fileID: 8890774966862588244}
   m_Layer: 5
-  m_Name: UI_Canvas_StarterAssetsInputs_Joysticks
+  m_Name: UI_Canvas_Inputs_Joysticks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -117,19 +116,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   starterAssetsInputs: {fileID: 0}
---- !u!114 &8890774966862588244
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6751388636123340836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 901182334643ba1438a25accc6bd0c79, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerInput: {fileID: 0}
 --- !u!1001 &5959203425529373846
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -391,7 +377,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 413722335, guid: 9e55d9b4642484f41be20c69a9b48063, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 9e55d9b4642484f41be20c69a9b48063, type: 3}
 --- !u!224 &287317552564024924 stripped
 RectTransform:
@@ -399,3 +386,54 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 8690618095626166063}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4635207389212637381 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4091757288130996202, guid: 9e55d9b4642484f41be20c69a9b48063,
+    type: 3}
+  m_PrefabInstance: {fileID: 8690618095626166063}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1732937337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4635207389212637381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1663187150}
+          m_TargetAssemblyTypeName: StarterAssets.UICanvasControllerInput, Assembly-CSharp
+          m_MethodName: VirtualJumpInput
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+  - eventID: 3
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1663187150}
+          m_TargetAssemblyTypeName: StarterAssets.UICanvasControllerInput, Assembly-CSharp
+          m_MethodName: VirtualJumpInput
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2

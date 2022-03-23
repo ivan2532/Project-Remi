@@ -92,7 +92,7 @@ namespace StarterAssets
 
 		private Animator _animator;
 		private CharacterController _controller;
-		private StarterAssetsInputs _input;
+		private PlayerInputs _input;
 		private Transform _mainCamera;
 
 		private const float _threshold = 0.01f;
@@ -113,7 +113,7 @@ namespace StarterAssets
 		{
 			_hasAnimator = TryGetComponent(out _animator);
 			_controller = GetComponent<CharacterController>();
-			_input = GetComponent<StarterAssetsInputs>();
+			_input = GetComponent<PlayerInputs>();
 
 			AssignAnimationIDs();
 

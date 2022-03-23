@@ -1,13 +1,9 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.EnhancedTouch;
-using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
-using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 namespace StarterAssets
 {
-	public class StarterAssetsInputs : MonoBehaviour
+    public class PlayerInputs : MonoBehaviour
 	{
 		[Header("Character Input Values")]
 		[SerializeField] private Vector2 move;
@@ -19,7 +15,7 @@ namespace StarterAssets
 
 		[Header("Touch Settings")]
 		[SerializeField] private float touchSensitivity = 10.0f;
-		private int lookTouchID;
+		private int lookTouchID = -1;
 
 #if UNITY_EDITOR
 		[Header("Editor Input Settings")]
@@ -27,11 +23,6 @@ namespace StarterAssets
 		[SerializeField] private float mouseSensitivity = 200.0f;
 		[SerializeField] private bool lockCursor = true;
 #endif
-
-		private void Awake()
-		{
-			EnhancedTouchSupport.Enable();
-		}
 
 		private void Update()
 		{
@@ -52,15 +43,21 @@ namespace StarterAssets
 #endif
 
 			look = Vector2.zero;
+			int touchCount = Input.touchCount;
 
-			if (Touch.activeTouches.Count > 0)
+			if (touchCount > 0)
 			{
 				//Find suitable touch
-				for (int i = 0; i < Touch.activeTouches.Count; i++)
+				for (int i = 0; i < touchCount; i++)
 				{
-					if (Touch.activeTouches[i].phase == TouchPhase.Began && !EventSystem.current.IsPointerOverGameObject(Touch.activeTouches[i].touchId))
+					Touch currentTouch = Input.GetTouch(i);
+					if (currentTouch.phase == TouchPhase.Began)
 					{
-						lookTouchID = Touch.activeTouches[i].touchId;
+						if (!EventSystem.current.IsPointerOverGameObject(i))
+							lookTouchID = currentTouch.fingerId;
+						else
+							lookTouchID = -1;
+
 						break;
 					}
 				}
@@ -68,19 +65,21 @@ namespace StarterAssets
 				Touch currentLookTouch;
 				if (GetTouch(lookTouchID, out currentLookTouch))
 				{
-					look.x = currentLookTouch.delta.x * touchSensitivity;
-					look.y = -currentLookTouch.delta.y * touchSensitivity;
+					look.x = currentLookTouch.deltaPosition.x * touchSensitivity;
+					look.y = -currentLookTouch.deltaPosition.y * touchSensitivity;
 				}
 			}
+			else
+				lookTouchID = -1;
 		}
 
-		private bool GetTouch(int touchID, out Touch result)
-        {
-			for (int i = 0; i < Touch.activeTouches.Count; i++)
-            {
-				var currentTouch = Touch.activeTouches[i];
+		private bool GetTouch(int fingerID, out Touch result)
+		{
+			for (int i = 0; i < Input.touchCount; i++)
+			{
+				Touch currentTouch = Input.GetTouch(i);
 
-				if (currentTouch.touchId == touchID)
+				if (currentTouch.fingerId == fingerID)
 				{
 					result = currentTouch;
 					return true;
@@ -89,16 +88,6 @@ namespace StarterAssets
 
 			result = new Touch();
 			return false;
-		}
-
-        public void OnMove(InputAction.CallbackContext value)
-		{
-			MoveInput(value.ReadValue<Vector2>());
-		}
-
-		public void OnJump(InputAction.CallbackContext value)
-		{
-			JumpInput(value.action.triggered);
 		}
 
 		public void MoveInput(Vector2 newMoveDirection)
